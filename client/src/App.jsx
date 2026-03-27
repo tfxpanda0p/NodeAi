@@ -53,6 +53,18 @@ function App() {
             <Route path="/history" element={user ? <History /> : <Navigate to="/login" />} />
           </Routes>
         </div>
+        {/* Footer */}
+        <footer className="relative z-10 py-3 text-center text-xs text-[var(--color-light-ash)]/40 border-t border-white/5">
+          Built by{' '}
+          <a
+            href="https://github.com/tfxpanda0p"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[var(--color-cyber-green)]/70 hover:text-[var(--color-cyber-green)] transition-colors duration-200"
+          >
+            Subham Banerjee
+          </a>
+        </footer>
       </div>
     </BrowserRouter>
   );
