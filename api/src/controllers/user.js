@@ -143,11 +143,11 @@ const getHistory = async (req, res) => {
 
     try {
         const page = parseInt(req.query.page, 10) || 1;
-        const limit = parseInt(req.query.limit, 10) || 2;
+        const limit = parseInt(req.query.limit, 10) || 20;
         const skip = (page - 1) * limit;
 
         const prompts = await Prompt.find({ user: req.userId })
-            .select("-_id user prompt response")
+            .select("user prompt response createdAt")
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
@@ -173,5 +173,28 @@ const getHistory = async (req, res) => {
     }
 }
 
+const deleteHistory = async (req, res) => {
+    logger.info(`Delete History endpoint hit for ID: ${req.params.id}`);
+    try {
+        const prompt = await Prompt.findOne({ _id: req.params.id, user: req.userId });
 
-module.exports = { register, login, logout, getHistory };
+        if (!prompt) {
+            logger.error(`History item not found for ID: ${req.params.id}`);
+            return res.status(404).json({ success: false, message: "History item not found" });
+        }
+
+        await Prompt.deleteOne({ _id: req.params.id });
+
+        // Remove from user's prompts array
+        await User.findByIdAndUpdate(req.userId, {
+            $pull: { prompts: req.params.id }
+        });
+        logger.info(`History item deleted successfully for ID: ${req.userId}`);
+        res.status(200).json({ success: true, message: "Deleted successfully" });
+    } catch (err) {
+        logger.error(`Error in deleteHistory: ${err.message}`);
+        res.status(500).json({ success: false, message: "Deletion failed" });
+    }
+}
+
+module.exports = { register, login, logout, getHistory, deleteHistory };

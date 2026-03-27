@@ -89,6 +89,26 @@ const savePrompt = async (req, res) => {
             return res.status(400).json({ success: false, message: "Incomplete prompt data" });
         }
 
+        // Check for duplicate to avoid "all saving as history" issue
+        const existingPrompt = await Prompt.findOne({ 
+            user: userId, 
+            prompt, 
+            response 
+        });
+
+        if (existingPrompt) {
+            res.clearCookie("savePromptToken", {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+            });
+            return res.status(200).json({ 
+                success: true, 
+                message: "Prompt already in history",
+                data: existingPrompt 
+            });
+        }
+
         const newPrompt = await Prompt.create({
             prompt,
             response,
