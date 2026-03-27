@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Full-stack concurrent dev setup",
   "scripts": {
-    "dev": "concurrently \"npm run dev --prefix api --ignore-scripts=false\" \"npm run dev --prefix client --ignore-scripts=false\"",
+    "dev": "npm_config_production=false concurrently \"npm run dev --prefix api\" \"npm run dev --prefix client\"",
     "install:all": "npm install --prefix api && npm install --prefix client"
   },
   "devDependencies": {
