@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Full-stack concurrent dev setup",
   "scripts": {
-    "dev": "concurrently \"cd api && node_modules/.bin/nodemon src/server.js\" \"cd client && node_modules/.bin/vite\"",
+    "dev": "concurrently \"npm run dev --prefix api --ignore-scripts=false\" \"npm run dev --prefix client --ignore-scripts=false\"",
     "install:all": "npm install --prefix api && npm install --prefix client"
   },
   "devDependencies": {
