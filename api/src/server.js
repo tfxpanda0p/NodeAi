@@ -30,14 +30,12 @@ app.use(morgan("dev"));
 app.use("/api/auth", authRouter);
 app.use("/api/user", aiRouter);
 
-// Serve React client in production
-if (process.env.NODE_ENV === "production") {
-  const clientBuildPath = path.join(__dirname, "../../client/dist");
-  app.use(express.static(clientBuildPath));
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(clientBuildPath, "index.html"));
-  });
-}
+// Serve React client static build
+const clientBuildPath = path.join(__dirname, "../../client/dist");
+app.use(express.static(clientBuildPath));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(clientBuildPath, "index.html"));
+});
 
 
 // Global Error Handler
