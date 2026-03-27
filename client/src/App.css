@@ -1,0 +1,35 @@
+/* App specific styles if needed, mainly relying on Tailwind utilities */
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translateY(-20px) translateX(10px);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-10px) translateX(-15px);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translateY(15px) translateX(5px);
+    opacity: 0.7;
+  }
+}
+
+.animate-float {
+  animation: float linear infinite;
+}
+
+.glass-card {
+  background: rgba(30, 30, 30, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glow-text {
+  text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
