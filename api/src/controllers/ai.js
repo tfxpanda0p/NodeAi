@@ -5,19 +5,19 @@ const User = require("../models/User");
 const logger = require("../config/logger");
 
 const askAi = async (req, res) => {
-    logger.info("Ask AI endpoint hit...");
+    logger.info(`Ask AI endpoint hit... | ${req.method} ${req.originalUrl} by ${req.userId}`);
 
     const { prompt } = req.body || {};
 
     if (!prompt) {
-        logger.error(`Prompt is required | ${req.method} ${req.originalUrl}`);
+        logger.error(`Prompt is required | ${req.method} ${req.originalUrl} by ${req.userId}`);
         return res.status(400).json({ success: false, message: "Prompt is required" });
     }
     try {
 
         const openRouterApiKey = process.env.OPENROUTER_API_KEY;
         if (!openRouterApiKey) {
-            logger.error("OPENROUTER_API_KEY is missing in environment variables");
+            logger.error(`OPENROUTER_API_KEY is missing in environment variables | ${req.method} ${req.originalUrl} by ${req.userId}`);
             return res.status(500).json({ success: false, message: "Server configuration error" });
         }
 
@@ -27,7 +27,7 @@ const askAi = async (req, res) => {
             {
                 model: process.env.MODEL_ID,
                 messages: [
-                    { role: "system", content: "You are a concise assistant. Provide only the direct, exact answer to the user's prompt. Do not include any extra explanations, greetings, warnings, or conversational filler." },
+                    { role: "system", content: "You are a concise assistant. Provide only the direct, exact answer to the user's prompt. Do not include any extra explanations, greetings or conversational filler." },
                     { role: "user", content: prompt }
                 ],
             },
@@ -42,6 +42,7 @@ const askAi = async (req, res) => {
 
         const aiResponse = response.data?.choices?.[0]?.message?.content;
         if (!aiResponse) {
+            logger.error(`Empty response from AI | ${req.method} ${req.originalUrl} by ${req.userId}`);
             return res.status(500).json({ success: false, message: "Empty response from AI" });
         }
 
@@ -59,18 +60,18 @@ const askAi = async (req, res) => {
 
     } catch (error) {
         logger.error(
-            `Error in askAi: ${error.response?.data ? JSON.stringify(error.response.data) : error.message}\n${error.stack}`
+            `Error in askAi: ${error.response?.data ? JSON.stringify(error.response.data) : error.message}\n${error.stack} | ${req.method} ${req.originalUrl} by ${req.userId}`
         );
         return res.status(500).json({ success: false, message: "Failed to fetch response from AI" });
     }
 };
 
 const savePrompt = async (req, res) => {
-    logger.info("Save Prompt endpoint hit...");
+    logger.info(`Save Prompt endpoint hit... | ${req.method} ${req.originalUrl} by ${req.userId}`);
     try {
         const token = req.cookies?.savePromptToken;
         if (!token) {
-            logger.error(`No prompt token found in cookies`);
+            logger.error(`No prompt token found in cookies | ${req.method} ${req.originalUrl} by ${req.userId}`);
             return res.status(400).json({ success: false, message: "No prompt data to save" });
         }
 
@@ -78,22 +79,22 @@ const savePrompt = async (req, res) => {
         try {
             decoded = jwt.verify(token, process.env.JWT_SECRET);
         } catch (err) {
-            logger.error(`Invalid prompt token: ${err.message}`);
+            logger.error(`Invalid prompt token: ${err.message} | ${req.method} ${req.originalUrl} by ${req.userId}`);
             return res.status(401).json({ success: false, message: "Invalid or expired prompt data" });
         }
 
         const { prompt, response, userId } = decoded;
 
         if (!prompt || !response || !userId) {
-            logger.error("Incomplete prompt data in token");
+            logger.error(`Incomplete prompt data in token | ${req.method} ${req.originalUrl} by ${req.userId}`);
             return res.status(400).json({ success: false, message: "Incomplete prompt data" });
         }
 
         // Check for duplicate to avoid "all saving as history" issue
-        const existingPrompt = await Prompt.findOne({ 
-            user: userId, 
-            prompt, 
-            response 
+        const existingPrompt = await Prompt.findOne({
+            user: userId,
+            prompt,
+            response
         });
 
         if (existingPrompt) {
@@ -102,10 +103,10 @@ const savePrompt = async (req, res) => {
                 secure: process.env.NODE_ENV === "production",
                 sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
             });
-            return res.status(200).json({ 
-                success: true, 
+            return res.status(200).json({
+                success: true,
                 message: "Prompt already in history",
-                data: existingPrompt 
+                data: existingPrompt
             });
         }
 
@@ -131,7 +132,7 @@ const savePrompt = async (req, res) => {
         });
 
     } catch (error) {
-        logger.error(`Error in savePrompt: ${error.message} \n ${error.stack}`);
+        logger.error(`Error in savePrompt: ${error.message} \n ${error.stack} | ${req.method} ${req.originalUrl} by ${req.userId}`);
         res.status(500).json({ success: false, message: "Failed to save prompt" });
     }
 };
