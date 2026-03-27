@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"],
+  origin: process.env.CLIENT_URL ? process.env.CLIENT_URL.split(",") : ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"],
   credentials: true,
 }));
 app.use(helmet());
@@ -32,12 +32,11 @@ app.use("/api/user", aiRouter);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-    logger.error(`${err.message} \n ${err.stack}`);
-    res.status(500).json({ success: false, message: "Server Error", error: err.message });
+  logger.error(`${err.message} \n ${err.stack}`);
+  res.status(500).json({ success: false, message: "Server Error", error: err.message });
 });
 
 connectDB();
-
-const server = app.listen(PORT, () => {
-    logger.info(`Server started in ${process.env.NODE_ENV ?? "development"} mode on port ${PORT}`);
+app.listen(PORT, () => {
+  logger.info(`Server started in ${process.env.NODE_ENV ?? "development"} mode on port ${PORT}`);
 });
