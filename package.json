@@ -4,6 +4,7 @@
   "description": "Full-stack concurrent dev setup",
   "scripts": {
     "dev": "npm install --prefix api && node api/src/server.js",
+    "build": "npm install --prefix api && npm install --prefix client && npm run build --prefix client",
     "start": "node api/src/server.js",
     "install:all": "npm install --prefix api && npm install --prefix client"
   }
