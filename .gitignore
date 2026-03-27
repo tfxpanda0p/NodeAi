@@ -1,0 +1,29 @@
+# Dependency directories
+node_modules/
+api/node_modules/
+client/node_modules/
+
+# Build outputs
+client/dist/
+dist/
+
+# Environment variables
+.env
+api/.env
+client/.env
+
+# Logs
+logs/
+api/logs/
+*.log
+npm-debug.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# VS Code / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
